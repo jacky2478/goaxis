@@ -6,13 +6,10 @@ const (
 )
 
 type ICallback interface {
-    /* 
-    1. define by customer, when broadcast or request is called, the function of Recv will pop from stack and execute
-    2. recvType maybe C_Type_BroadCast, C_RecvType_Sync or C_RecvType_ASync
-    3. caller is the master from module, it's a function name in module
-    4. datas is the runtime data send by caller, you can tranform to the datas you want by data.IDataSet
-    */
+    // get datas or flow from the scheduling layer, the mode is synchronize or asynchronous
     Pull(mode string, caller ICaller, dv IDataSet) error
+
+    // push datas or flow to the scheduling layer, the mode is synchronize or asynchronous
     Push(mode string, caller ICaller, dv IDataSet) error
 }
 
