@@ -18,7 +18,7 @@ package main
 import (
     "/path/libdb"
     "/path/libhttp"
-    "github.com/jackychen/goaxis"
+    "github.com/jacky2478/goaxis"
 )
 
 var tdb, tweb goaxis.IHub
