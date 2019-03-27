@@ -14,16 +14,8 @@ Goaxis follows the idea of high cohesion and low coupling, which can ensure that
 
 ```
 // fake code
-package main
-import (
-    "/path/libdb"
-    "/path/libhttp"
-    "github.com/jacky2478/goaxis"
-)
-
-var tdb, tweb goaxis.IHub
+// at the scheduling layer, implement goaxis.ICallback
 type workRsp struct{}
-
 func (p *workRsp) Pull(mode string, caller goaxis.ICaller, ds goaxis.IDataSet) error {
     switch caller.Format(".") {
     case "libweb.Listen":
@@ -36,27 +28,55 @@ func (p *workRsp) Pull(mode string, caller goaxis.ICaller, ds goaxis.IDataSet) e
 func (p *workRsp) Push(mode string, caller goaxis.ICaller, ds goaxis.IDataSet) error {
     switch caller.Format(".") {
     case "libweb.RegistVerify":
-       data := dv.Input().GetMust(reflect.String) 
+       data := ds.Input().Get().(string)
        libdb.IsUserExist(data)
     }
     return nil
 }
 
+// Initialize the IHUB interface for each component
 func main() {
     tdb = goaxis.Create("libdb", &workRsp{})
     tweb = goaxis.Create("libhttp", &workRsp{})
-    
-    // inside libdb:
-    // pull datas from other module: tdb.SyncPull, tdb.ASyncPull
-    // push datas by boradcast: tdb.SyncPush, tdb.ASyncPush
+
     libdb.Init(tdb)
-
-    // inside libweb:
-    // pull datas from other module: tweb.SyncPull, tweb.ASyncPull
-    // push datas by boradcast: tweb.SyncPush, tweb.ASyncPush
     libweb.Init(tweb)
-
     libweb.ServeAndListen()
+}
+
+// Synchronization request using the IHub interface
+func ServeAndListen()
+{
+    pullData := goaxis.DataSet()
+    if err := tdb.SyncPull(tdb.Caller("ServeAndListen", "GetPort"), pullData); err == nil {
+        port := pullData.Output().Get()
+    }
+}
+
+// Asynchronous request using the IHub interface
+func HandleLogin()
+{
+    // 1. verify user login
+
+    // 2. get offline messages to push
+    pullData := goaxis.DataSet()
+    if err := tdb.ASyncPull(tdb.Caller("HandleLogin", "GetOfflineMessages"), pullData); err == nil {
+        messages := pullData.Output().GetValueByPush()
+    }
+}
+
+// Synchronization broadcast using the IHub interface
+func InitDB()
+{
+    pushData := goaxis.DataSet("MySql")
+    tdb.SyncPush(tdb.Caller("InitDB"), pushData)
+    mysqlAddr := fmt.Sprintf("%v", pushData.Output().Get())
+}
+
+// Asynchronous broadcast using the IHub interface
+func WaitReceive()
+{
+    tweb.ASyncPush(tdb.Caller("WaitReceive"), goaxis.DataSet("data from net"))
 }
 ```
 
