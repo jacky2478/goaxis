@@ -158,7 +158,13 @@ func (p *dataSetV) GetByName(name string) interface{} {
             return nil
         }
 
-        fillVV := reflect.ValueOf(p.fillV).Elem()
+        var fillVV reflect.Value
+        if reflect.TypeOf(p.fillV).Kind() == reflect.Ptr {
+            fillVV = reflect.ValueOf(p.fillV).Elem()
+        } else {
+            fillVV = reflect.ValueOf(p.fillV)
+        }
+
         if !fillVV.IsValid() {
             return nil
         }
