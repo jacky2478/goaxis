@@ -56,7 +56,6 @@ type IDataSet interface {
 type IValue interface {
     IInValue
     IOutValue
-    ReadyWaitSet()
 }
 
 type IInValue interface {

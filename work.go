@@ -100,3 +100,11 @@ func DataSet(datas ...interface{}) IDataSet {
     }
     return p
 }
+
+// create for hook ---> dataset := DataSetByHook(setHook, getHook)
+func DataSetByHook(setHook, getHook func(IValue) error) IDataSet {
+    p := new(dataSet)
+    p.setHook = setHook
+    p.getHook = getHook
+    return p
+}
