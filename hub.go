@@ -37,16 +37,24 @@ func (p *hub) ASyncPull(caller ICaller, ds IDataSet) error {
         return fmt.Errorf("ASyncPull failed with invalid param, ds: %+v", ds)
     }
 
+    // use the customize getHook
+    if ds.(*dataSet).getHook != nil {
+        go p.response.Pull(C_Mode_ASync, caller, ds)
+        return nil
+    }
+
     waitSetCh := make(chan byte, 1)
     var ptrWaitSetCh *chan byte = &waitSetCh
-    ds.(*dataSet).ResetHookForGet(func(v IValue) error {
-        if ptrWaitSetCh != nil && *ptrWaitSetCh != nil {
-            <- *ptrWaitSetCh
-            close(*ptrWaitSetCh)
-            *ptrWaitSetCh = nil
-        }
-        return nil
-    })
+    if pds, ok := ds.(*dataSet); ok && pds != nil {
+        pds.ResetHookForGet(func(v IValue) error {
+            if ptrWaitSetCh != nil && *ptrWaitSetCh != nil {
+                <- *ptrWaitSetCh
+                close(*ptrWaitSetCh)
+                *ptrWaitSetCh = nil
+            }
+            return nil
+        })
+    }
 
     go func() {
         p.response.Pull(C_Mode_ASync, caller, ds)
