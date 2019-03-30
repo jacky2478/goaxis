@@ -13,20 +13,13 @@ const (
 )
 
 var pushData int
-type workRsp struct{}
 
-func (p *workRsp) Pull(mode string, caller ICaller, ds IDataSet) error {
+func Notify(mode string, caller ICaller, ds IDataSet) error {
     switch caller.Last() {
     case "TestPull":
         if str, ok := ds.Input().Get().(string); ok && str == c_Test_Str {
             ds.Output().Set(c_Test_Str_Expect)
         }
-    }
-    return nil
-}
-
-func (p *workRsp) Push(mode string, caller ICaller, ds IDataSet) error {
-    switch caller.Last() {
     case "TestPush":
        if idata, ok := ds.Input().Get().(int); ok {
             ds.Output().Set(idata + c_Test_Int2)
@@ -36,7 +29,7 @@ func (p *workRsp) Push(mode string, caller ICaller, ds IDataSet) error {
 }
 
 func TestCreate(t *testing.T) {
-    ttest := Create("libtest", &workRsp{})
+    ttest := Create("libtest", Notify)
 
     // test pull
     dataPull := DataSet(c_Test_Str)

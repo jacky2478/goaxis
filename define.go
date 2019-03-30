@@ -1,16 +1,18 @@
 package goaxis
 
 const (
-    C_Mode_Sync = "synchronize"
-    C_Mode_ASync = "asynchronous"
+    C_Mode_Pull = "pull"
+    C_Mode_Push = "push"
 )
 
 type ICallback interface {
-    // get datas or flow from the scheduling layer, the mode is synchronize or asynchronous
-    Pull(mode string, caller ICaller, dv IDataSet) error
+    // // get datas or flow from the scheduling layer, the mode is synchronize or asynchronous
+    // Pull(mode string, caller ICaller, dv IDataSet) error
 
-    // push datas or flow to the scheduling layer, the mode is synchronize or asynchronous
-    Push(mode string, caller ICaller, dv IDataSet) error
+    // // push datas or flow to the scheduling layer, the mode is synchronize or asynchronous
+    // Push(mode string, caller ICaller, dv IDataSet) error
+
+    Notify(mode string, caller ICaller, ds IDataSet) error
 }
 
 type IHub interface {

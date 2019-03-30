@@ -71,8 +71,8 @@ func WaitReceive()
     tweb.ASyncPush(tdb.Caller("WaitReceive"), goaxis.DataSet("data from net"))
 }
 */
-func Create(module string, rsp ICallback) IHub {
-    return newHub(module, rsp)
+func Create(module string, notify func(mode string, caller ICaller, ds IDataSet) error) IHub {
+    return newHub(module, notify)
 }
 
 // 1. create for push or pull ---> dataset := DataSet(333)
